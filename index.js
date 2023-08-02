@@ -9,6 +9,12 @@ function checkData(data) {
   // Якщо об'єкт не пустий повертаємо дані
   // Інакше створюємо помилку,в якості тексту помилки ми використовуємо рядок "Об'єкт пустий".
   // Якщо виникла помилка, повертаємо її повідомлення.
+  if (data !== null) {
+    return data;
+  } else {
+    const error = new Error("Об'єкт пустий");
+    return error.message;
+  }
 }
 
 console.log("Завдання: 1 ==============================");
@@ -30,6 +36,12 @@ function parseJson(jsonStr) {
   // Якщо рядок має невірний формат, виникне помилка, яку ми обробляємо у блоку catch.
   // Повертаємо отриманий об'єкт
   // Якщо виникла помилка, повертаємо її повідомлення.
+  try {
+    const obj = JSON.parse(jsonStr);
+    return obj;
+  } catch (error) {
+    return error.message;
+  }
 }
 console.log("Завдання: 2 ==============================");
 
@@ -60,6 +72,17 @@ function getAge(age) {
   // Викидаємо помилку
   // Якщо помилки не має повертаємо рядок `Вік користувача: ${age}`
   // Якщо виникла помилка, повертаємо об'єкт з name та message помилки.
+  try {
+    if (age < 0) {
+      const error = new Error("Вік не може бути менше 0!");
+      error.name = "AgeError";
+      throw error;
+    } else {
+      return `Вік користувача: ${age}`;
+    }
+  } catch (error) {
+    return { error: `${error.message}`, name: `${error.name}` };
+  }
 }
 console.log("Завдання: 3 ==============================");
 
@@ -83,6 +106,18 @@ function getBookById(books, id) {
   // Якщо книга не знайдена, генерується TypeError з повідомленням Книга з ID ${id} не знайдена!.
   // Повертаємо book
   // Повертаємо текстове представлення помилки
+
+  try {
+    const book = books.find((element) => element["id"] === id);
+
+    if (book === undefined) {
+      const err = new TypeError(`Книга з ID ${id} не знайдена!`);
+      throw err;
+    }
+    return `Книга: ${book["title"]}`;
+  } catch (err) {
+    return err.toString();
+  }
 }
 console.log("Завдання: 4 ==============================");
 
@@ -123,6 +158,16 @@ function decodeURIComponentWrapper(encodedString) {
   // Повертаємо декодований рядок
   // Якщо виникла помилка, і ії назва дорівнює URIError повертаємо помилку про неправильний URI формат з повідомленням Помилка декодування URI,
   //  інкше повертаємо текстове представлення помилки
+  try {
+    return decodeURIComponent(encodedString);
+  } catch (error) {
+    if (error.name === "URIError") {
+      error.message = "Помилка декодування URI";
+      return error;
+    } else {
+      return error.toString();
+    }
+  }
 }
 
 console.log("Завдання: 5 ==============================");
@@ -130,7 +175,7 @@ console.log("Завдання: 5 ==============================");
 console.log(decodeURIComponentWrapper("Hello%20World")); // виведе 'Hello World'
 console.log(decodeURIComponentWrapper("%E0%A4%A")); // виведе інформацію про помилку URIError
 
-// Завдання 6
+// Зав дання 6
 /**
  * Функція `findEvenNumber` знаходить перше число, що ділиться на 2 без остачі в масиві.
  * Якщо такого числа немає, вона кидає помилку.
@@ -144,6 +189,24 @@ function findEvenNumber(numbers) {
   // Якщо число знайдено повертаємо його
   // Виводимо текстове представлення помилки.
   // Незалежно від результату, виводимо вихідний масив.
+  let evenNumber;
+  for (let i = 0; i < numbers.length; i++) {
+    if (numbers[i] % 2 === 0) {
+      evenNumber = numbers[i];
+      i = numbers.length;
+    }
+  }
+
+  console.log(numbers);
+
+  if (!evenNumber) {
+    const err = new Error(
+      "У масиві немає чисел, що діляться на 2 без остачі!."
+    );
+    return err.toString();
+  } else {
+    return evenNumber;
+  }
 }
 
 console.log("Завдання: 6 ==============================");
@@ -170,6 +233,19 @@ function validateUser(user) {
   // Перевіряємо, чи існує email користувача,якщо ні викидуємо помилку з повідомленням "Email користувача не вказано!", а як причину вказуємо об'єкт user.
   // Якщо всі перевірки пройдено успішно виводимо повідомлення "Об'єкт користувача відповідає всім вимогам."
   // Виводимо повідомлення про помилку та причину помилки.
+  if (typeof user !== "object") {
+    console.log(new Error("Об'єкт користувача не вказано!"));
+  } else if (!user.hasOwnProperty("name")) {
+    const err = new Error("Ім'я користувача не вказано!", { cause: user });
+    console.log(err.message, err.cause);
+  } else if (!user.hasOwnProperty("email")) {
+    const err = new Error("Email користувача не вказано!", {
+      cause: user,
+    });
+    console.log(err.message, err.cause);
+  } else {
+    console.log("Об'єкт користувача відповідає всім вимогам.");
+  }
 }
 
 console.log("Завдання: 7 ==============================");
@@ -192,6 +268,15 @@ function calculateSquareRoot(number) {
   // Перевіряємо, чи число не від'ємне, якщо ні викидуємо помилку про тип недопустимий діапазон з повідомленням Число не повинно бути від'ємним!".
   // Повертаємо корінь квадратний з вхідного значення
   // Повертаємо повідомлення про помилку.
+  if (typeof number !== "number") {
+    const err = new TypeError("Аргумент має бути числом!");
+    return err.message;
+  } else if (number < 0) {
+    const err = new RangeError("Число не повинно бути від'ємним!");
+    return err.message;
+  } else {
+    return Math.sqrt(number);
+  }
 }
 
 console.log("Завдання: 8 ==============================");
@@ -218,6 +303,14 @@ function processData(data) {
   // Повертаємо рядок "Дані успішно оброблені"
   // Виводимо stack trace помилки
   // Повертаємо повідомлення помилки
+  for (const index in data) {
+    if (typeof data[index] !== "number") {
+      const err = new TypeError(`Елемент з індексом ${index} має бути числом!`);
+      console.log(err.stack);
+      return err.message;
+    }
+  }
+  return "Дані успішно оброблені";
 }
 
 console.log("Завдання: 9 ==============================");
@@ -241,6 +334,11 @@ console.log(processData([1, "two", 3]));
 function evaluateExpression(expression) {
   // Повертаємо результат розрахунку
   // Якщо була виявлена помилка повертаємо помилку при виконанні функції eval
+  try {
+    return eval(expression);
+  } catch (err) {
+    return err;
+  }
 }
 
 console.log("Завдання: 10 ==============================");
